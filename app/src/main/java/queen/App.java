@@ -3,12 +3,16 @@
  */
 package queen;
 
+import org.usb4java.LibUsbException;
+
+import queen.exploit.Exploit;
+
 public class App {
     public String getGreeting() {
         return "Hello World!";
     }
 
     public static void main(String[] args) {
-        System.out.println(new App().getGreeting());
+        Exploit.runCheckm8();
     }
 }
