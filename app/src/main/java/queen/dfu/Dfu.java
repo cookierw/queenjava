@@ -11,6 +11,7 @@ import org.usb4java.DeviceHandle;
 import org.usb4java.LibUsb;
 import org.usb4java.LibUsbException;
 import org.usb4java.Transfer;
+import org.usb4java.TransferCallback;
 
 public class Dfu {
     private static short vid = 0x5AC;
@@ -116,9 +117,9 @@ public class Dfu {
         // byte[] request = createRequest(bmRequestType, bRequest, wValue, wIndex, data, timeout);
         Transfer transfer = LibUsb.allocTransfer(0);
         // LibUsb.fillControlSetup(data, bmRequestType, bRequest, wValue, wIndex, (short)data.array().length);
-        LibUsb.fillControlTransfer(transfer, handle, data, null, null, timeout);
+        LibUsb.fillControlTransfer(transfer, handle, data, transferCb, null, timeout);
         // Long start = System.currentTimeMillis();
-
+        
         if (LibUsb.submitTransfer(transfer) != 0) {
             System.err.println("Unable to submit async transfer.");
             System.exit(-1);
@@ -133,13 +134,25 @@ public class Dfu {
         //     System.exit(-1);
         // }
     }
+    
+    private TransferCallback transferCb = new TransferCallback() {
+    	@Override
+        public void processTransfer(Transfer transfer)
+        {
+            System.out.println(transfer.actualLength() + " bytes received");
+            LibUsb.cancelTransfer(transfer);
+            LibUsb.freeTransfer(transfer);
+            System.out.println("Asynchronous communication finished");
+//            exit = true;
+        }
+    };
 
     public void noErrorCtrlTransfer(
             byte bmRequestType, byte bRequest,
             short wValue, short wIndex,
             ByteBuffer data, Long timeout
     ) {
-        LibUsb.controlTransfer(handle, bmRequestType, bRequest, wValue, wIndex, data, wIndex);
+        LibUsb.controlTransfer(handle, bmRequestType, bRequest, wValue, wIndex, data, timeout);
     }
 
     public void stall() {
