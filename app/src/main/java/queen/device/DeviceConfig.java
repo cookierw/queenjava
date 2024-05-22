@@ -25,8 +25,10 @@ public class DeviceConfig {
     private long dcCivac;
     private long dmb;
     private long handleInterfaceRequest;
+    
+    private long nopGadget;
 
-    private Callback[] callbacks;
+	private Callback[] callbacks;
 
     public DeviceConfig(
             String version,
@@ -69,6 +71,15 @@ public class DeviceConfig {
                         Long.valueOf(PAYLOAD_SIZE_ARM64), // # 7 - PAYLOAD_SIZE
                         0x180008638l  // # 8 - PAYLOAD_PTR
                 };
+                
+                this.loadWriteGadget = 			0x10000945Cl;
+                this.writeSctlrGadget = 		0x1000003ECl;
+                this.funcGadget = 				0x10000A9ACl;
+                this.writeTtbr0 = 				0x10000045Cl;
+                this.tlbi = 					0x1000004ACl;
+                this.dcCivac = 					0x1000004D0l;
+                this.dmb = 						0x1000004F0l;
+                this.handleInterfaceRequest = 	0x10000BCCCl;
 
                 this.callbacks = new Callback[] {
                         new Callback(this.dcCivac, 0x18001C800l),
@@ -85,6 +96,8 @@ public class DeviceConfig {
                         new Callback(this.tlbi, 0x0l),
                         new Callback(0x18001C800l, 0x0l)
                 };
+                
+                this.nopGadget = 0x10000A9C4l;
         }
     }
 
@@ -231,4 +244,12 @@ public class DeviceConfig {
     public void setCallbacks(Callback[] callbacks) {
         this.callbacks = callbacks;
     }
+
+    public long getNopGadget() {
+		return nopGadget;
+	}
+
+	public void setNopGadget(long nopGadget) {
+		this.nopGadget = nopGadget;
+	}
 }
